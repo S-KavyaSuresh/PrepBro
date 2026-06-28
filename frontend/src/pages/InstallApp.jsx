@@ -218,7 +218,6 @@ Choose how you want to access PrepBro across desktop, mobile, and the web app ex
     </section>
   )}
 </div>
-```
 
 );
 }
