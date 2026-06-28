@@ -1,51 +1,35 @@
 # PrepBro
 
-PrepBro is an accessibility-first study companion with AI-assisted study tools, account-based progress, mentor workflows, assignments, badges, and PWA install support.
+PrepBro is an accessibility-first study companion with student and mentor workflows, assignments, badges, account progress, email verification, and PWA install support.
 
-This folder is the GitHub-ready copy of the project:
+## Project Structure
 
-- live `.env` files are excluded
-- local SQLite data is excluded
-- build output, virtual environments, caches, and editor folders are excluded
+- `frontend/` — React + Vite app
+- `backend/` — FastAPI API
+- `backend/prepbro.db` — local development SQLite database file
 
-## Stack
+## Environment Files
 
-- Frontend: React + Vite
-- Backend: FastAPI
-- Database: SQLite
-- Auth: JWT + bcrypt
-- Install support: PWA manifest, service worker, install UI, mobile and desktop icons
-
-## Main Features
-
-- Guest mode with local browser progress
-- Student and Mentor accounts
-- Email verification with SMTP support
-- Progress dashboard, badges, assignments, classes, and reports
-- Text simplification, planning, gamified learning, and break-time tools
-
-## Environment Setup
+Do not commit real secrets.
 
 Backend:
 
 1. Copy `backend/.env.example` to `backend/.env`
-2. Fill in your real values locally
+2. Fill in real values locally
 
 Frontend:
 
 1. Copy `frontend/.env.example` to `frontend/.env`
-2. Set `VITE_API_BASE_URL`
+2. Set the API URL for the current environment
 
-Do not commit real `.env` files.
-
-## Run Locally
+## Local Run Commands
 
 Backend:
 
 ```bash
 cd backend
 py -m pip install -r requirements.txt
-py -m uvicorn app.main:app --reload --port 8000
+py -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 Frontend:
@@ -56,29 +40,33 @@ npm install
 npm run dev
 ```
 
-## What Was Removed From This Copy
+## Production Backend Start Command
 
-- `backend/.env`
-- `frontend/.env`
-- `backend/prepbro.db`
-- `backend/venv`
-- `frontend/node_modules`
-- `frontend/dist`
-- `.vscode`
-- Python cache folders
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
 
-## Push Checklist
+## Frontend Build Command
 
-1. Create fresh local `.env` files from the examples
-2. Confirm no real secrets were added to tracked files
-3. Run backend and frontend once locally
-4. Initialize git in this folder if needed
-5. Commit and push
+```bash
+npm run build
+```
 
 ## Deployment Notes
 
 - Set `APP_ENV=production`
-- Use a strong `JWT_SECRET`
-- Point `FRONTEND_URL` to your deployed frontend
-- Put `DATABASE_URL` on durable storage
-- Configure SMTP with real production credentials through environment variables
+- Set a strong `JWT_SECRET`
+- Set `FRONTEND_URL` to the deployed frontend origin
+- Set `VITE_API_BASE_URL` to the deployed backend URL
+- Use PostgreSQL in production with `DATABASE_URL=postgresql://username:password@host:5432/database`
+- Keep SQLite only for local development with `DATABASE_URL=sqlite:///./prepbro.db`
+- Do not use local `prepbro.db` in production
+- SMTP is optional in development, but required for real email verification in production
+- Production CORS is restricted to `FRONTEND_URL`
+
+## Recommended Platforms
+
+- Frontend: Vercel or Netlify
+- Backend: Render or Railway
+
+These fit the current React + FastAPI split without changing app logic.

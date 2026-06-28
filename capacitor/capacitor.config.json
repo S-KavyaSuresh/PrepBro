@@ -1,0 +1,8 @@
+{
+  "appId": "com.prepbro.app",
+  "appName": "PrepBro",
+  "webDir": "../frontend/dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}

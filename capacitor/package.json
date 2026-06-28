@@ -1,0 +1,18 @@
+{
+  "name": "prepbro-capacitor",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "sync": "npx cap sync android",
+    "copy": "npx cap copy android",
+    "open:android": "npx cap open android",
+    "build:android": "cd ../frontend && npm run build && cd ../capacitor && npx cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.1",
+    "@capacitor/core": "^7.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.1"
+  }
+}
