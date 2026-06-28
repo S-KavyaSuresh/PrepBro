@@ -1,3 +1,28 @@
+<p align="center">
+  <img src="frontend/public/icons/prepbro.ico" alt="PrepBro Logo" width="120" />
+</p>
+
+<h1 align="center">PrepBro</h1>
+
+<p align="center">
+  <b>AI-Powered Accessibility-First Learning Platform</b>
+</p>
+
+<p align="center">
+  Study at your own pace — simplify content, plan better, practice with quizzes, take healthy breaks, and track progress with mentor support.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Frontend-React-61DAFB?style=for-the-badge&logo=react&logoColor=black" />
+  <img src="https://img.shields.io/badge/Build-Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" />
+  <img src="https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
+  <img src="https://img.shields.io/badge/AI-Groq-F55036?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Accessibility-Friendly-7C3AED?style=for-the-badge" />
+</p>
+
+---
+
+
 # PrepBro
 
 ## Study at Your Own Pace
