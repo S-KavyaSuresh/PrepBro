@@ -8,11 +8,11 @@ const INSTALL_TABS = [
 
 const WINDOWS_INSTALLER_URL =
 import.meta.env.VITE_WINDOWS_INSTALLER_URL ||
-"https://github.com/S-KavyaSuresh/PrepBro/releases/download/v1.0.0/PrepBro.Setup.1.0.0.exe";
+"https://github.com/S-KavyaSuresh/PrepBro/releases/download/v2.1.0/PrepBro.Setup.1.0.0.exe";
 
 const ANDROID_APK_URL =
 import.meta.env.VITE_ANDROID_APK_URL ||
-"https://github.com/S-KavyaSuresh/PrepBro/releases/download/v1.0.0/PrepBro-Android.apk";
+"https://github.com/S-KavyaSuresh/PrepBro/releases/download/v2.1.0/PrepBro-Android.apk";
 
 function getWebInstallState({ isInstalled, installAvailable }) {
 if (isInstalled) {
