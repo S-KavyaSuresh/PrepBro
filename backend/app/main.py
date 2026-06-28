@@ -1110,8 +1110,20 @@ def send_signup_email_verification_response(connection, email: str, draft: Optio
         token=verification["token"],
         verify_url=f"{settings.frontend_url.rstrip('/')}/?verify={verification['token']}",
     )
-    if settings.app_env.lower() == "production" and not result.get("sent"):
-        result = {"sent": False, "reason": "SMTP is not configured for this deployment."}
+    if not result.get("sent"):
+        if settings.demo_verification_fallback:
+            connection.execute(
+                "UPDATE pending_email_verifications SET verified_at = COALESCE(verified_at, ?) WHERE email = ? AND used_at IS NULL",
+                (utc_now(), email),
+            )
+            print(f"Demo verification fallback used for signup email: {email}")
+            result = {
+                "sent": True,
+                "demo_fallback": True,
+                "reason": "Email verification is unavailable in this demo deployment. You can continue using PrepBro for testing.",
+            }
+        elif settings.app_env.lower() == "production":
+            result = {"sent": False, "reason": "Verification email could not be sent right now."}
     return {
         "ok": True,
         "email": email,
@@ -1137,8 +1149,18 @@ def send_verification_response(connection, user_id: int, email: str) -> Dict[str
         token=verification["token"],
         verify_url=f"{settings.frontend_url.rstrip('/')}/?verify={verification['token']}",
     )
-    if settings.app_env.lower() == "production" and not result.get("sent"):
-        result = {"sent": False, "reason": "SMTP is not configured for this deployment."}
+    if not result.get("sent"):
+        if settings.demo_verification_fallback:
+            connection.execute("UPDATE users SET is_verified = 1 WHERE id = ?", (user_id,))
+            print(f"Demo verification fallback used for existing account: {email}")
+            result = {
+                "sent": True,
+                "demo_fallback": True,
+                "reason": "Email verification is unavailable in this demo deployment. You can continue using PrepBro for testing.",
+            }
+            user = serialize_user(connection, user_id)
+        elif settings.app_env.lower() == "production":
+            result = {"sent": False, "reason": "Verification email could not be sent right now."}
     return {
         "ok": True,
         "user_id": user_id,

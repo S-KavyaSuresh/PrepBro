@@ -62,6 +62,7 @@ npm run build
 - Keep SQLite only for local development with `DATABASE_URL=sqlite:///./prepbro.db`
 - Do not use local `prepbro.db` in production
 - SMTP is optional in development, but required for real email verification in production
+- Email verification uses SMTP in normal deployments. On Render Free demo deployments, SMTP may be unavailable, so demo verification fallback can be enabled using `DEMO_VERIFICATION_FALLBACK=true`.
 - Production CORS is restricted to `FRONTEND_URL`
 
 ## Recommended Platforms

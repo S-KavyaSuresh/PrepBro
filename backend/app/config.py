@@ -13,6 +13,7 @@ class Settings:
     app_name: str
     app_env: str
     database_url: str
+    demo_verification_fallback: bool
     jwt_secret: str
     jwt_expire_minutes: int
     frontend_url: str
@@ -52,6 +53,7 @@ def get_settings() -> Settings:
         app_name=os.getenv("APP_NAME", "PrepBro API"),
         app_env=os.getenv("APP_ENV", "development"),
         database_url=os.getenv("DATABASE_URL", "sqlite:///./prepbro.db"),
+        demo_verification_fallback=os.getenv("DEMO_VERIFICATION_FALLBACK", "false").lower() in {"1", "true", "yes", "on"},
         jwt_secret=os.getenv("JWT_SECRET", ""),
         jwt_expire_minutes=int(os.getenv("JWT_EXPIRE_MINUTES", "120")),
         frontend_url=os.getenv("FRONTEND_URL", "http://localhost:5173"),

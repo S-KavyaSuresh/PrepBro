@@ -365,7 +365,13 @@ export default function AuthPage({ mode = "signup", onAuthSuccess, onBackToDashb
         email: signupAccountEmail,
         draft: buildSignupVerificationDraft(),
       }));
-      if (response.sent) {
+      if (response.demo_fallback) {
+        localStorage.setItem(SIGNUP_VERIFY_KEY, signupAccountEmail);
+        setVerifiedSignupEmail(signupAccountEmail);
+        setSignupVerificationStatus("Email verification is unavailable in this demo deployment. You can continue using PrepBro for testing.");
+        setSignupVerificationPreviewUrl("");
+        emitToast("Email verification is unavailable in this demo deployment. You can continue using PrepBro for testing.", "success");
+      } else if (response.sent) {
         setSignupVerificationStatus(`Verification email sent to ${signupAccountEmail}. Please check inbox or spam and verify it to continue.`);
         setSignupVerificationPreviewUrl(response.preview_verify_url || "");
         emitToast(`Verification email sent to ${signupAccountEmail}.`, "success");
