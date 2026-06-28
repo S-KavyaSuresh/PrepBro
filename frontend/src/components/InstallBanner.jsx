@@ -25,7 +25,7 @@ export default function InstallBanner({ isInstalled, onOpenInstall }) {
   return (
     <div className="install-banner" role="region" aria-label="Install PrepBro">
       <div className="install-banner-main">
-        <img src="/icons/prepbro-192-final.png?v=prepbro-icon-final" alt="PrepBro icon" className="prepbro-app-icon install-banner-icon" />
+        <img src="/icons/prepbro-192-final.png?v=prepbro-icon-safe" alt="PrepBro icon" className="prepbro-app-icon install-banner-icon" />
         <div className="install-banner-copy">
           <div className="install-banner-title">Install PrepBro</div>
           <div className="install-banner-text">Get faster access from your desktop, Android home screen, or browser app launcher.</div>

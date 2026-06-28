@@ -32,6 +32,8 @@ export default function App() {
   const [aiOpen, setAiOpen] = useState(false);
   const [mode, setMode] = useState(getCurrentMode());
   const [backendStatus, setBackendStatus] = useState("checking");
+  const [backendWakeLoading, setBackendWakeLoading] = useState(false);
+  const [backendWakeMessage, setBackendWakeMessage] = useState("");
   const [toasts, setToasts] = useState([]);
   const [deferredInstallPrompt, setDeferredInstallPrompt] = useState(null);
   const [installPromptAvailable, setInstallPromptAvailable] = useState(false);
@@ -46,6 +48,8 @@ export default function App() {
   });
 
   const authSession = useMemo(() => loadAuthSession(), [mode, userPanelOpen]);
+  const apiBaseUrl = useMemo(() => getApiBase(), []);
+  const isLocalApi = useMemo(() => /localhost|127\.0\.0\.1/i.test(apiBaseUrl), [apiBaseUrl]);
   const accountButtonLabel = useMemo(() => getUserFirstName(), [mode, userPanelOpen, authSession?.user?.display_name]);
   const accountAvatar = useMemo(() => getAvatarDataFromUser(authSession?.user), [authSession?.user]);
 
@@ -63,12 +67,37 @@ export default function App() {
 
   const checkBackend = useCallback(async () => {
     try {
-      const res = await fetch(`${getApiBase()}/health`, { signal: AbortSignal.timeout(4000) });
-      setBackendStatus(res.ok ? "ok" : "down");
+      const res = await fetch(`${apiBaseUrl}/health`, { signal: AbortSignal.timeout(4000) });
+      const isHealthy = res.ok;
+      setBackendStatus(isHealthy ? "ok" : "down");
+      if (isHealthy) setBackendWakeMessage("");
+      return isHealthy;
     } catch {
       setBackendStatus("down");
+      return false;
     }
-  }, []);
+  }, [apiBaseUrl]);
+
+  const wakeBackend = useCallback(async () => {
+    if (backendWakeLoading) return;
+    setBackendWakeLoading(true);
+    setBackendWakeMessage("");
+
+    const startedAt = Date.now();
+    const timeoutMs = 60_000;
+
+    while (Date.now() - startedAt <= timeoutMs) {
+      const isHealthy = await checkBackend();
+      if (isHealthy) {
+        setBackendWakeLoading(false);
+        return;
+      }
+      await new Promise((resolve) => window.setTimeout(resolve, 3000));
+    }
+
+    setBackendWakeLoading(false);
+    setBackendWakeMessage("The backend is still waking up. Please wait a little longer and try again.");
+  }, [backendWakeLoading, checkBackend]);
 
   useEffect(() => {
     checkBackend();
@@ -258,7 +287,9 @@ export default function App() {
     <div className={`app-root ${aiOpen ? "ai-open" : ""}`}>
       <header className="app-header">
         <div className="app-logo">
-          <img src="/icons/prepbro-192-final.png?v=prepbro-icon-final" alt="PrepBro app icon" className="logo-icon" />
+          <span className="logo-wrap" aria-hidden="true">
+            <img src="/icons/prepbro-192-final.png?v=prepbro-icon-safe" alt="" className="logo-icon" />
+          </span>
           <span className="logo-mark">Prep</span>
           <span className="logo-mark-alt">Bro</span>
           <span className="logo-tagline">Study at Your Own Pace</span>
@@ -292,9 +323,25 @@ export default function App() {
         <div className="backend-banner">
           <span className="backend-banner-icon">!</span>
           <span className="backend-banner-text">
-            <strong>Backend server is not running.</strong> Start the FastAPI app in <code>backend/</code> with <code>uvicorn app.main:app --reload</code>.
+            {isLocalApi ? (
+              <>
+                <strong>Backend server is not running.</strong> Start the FastAPI app in <code>backend</code>.
+              </>
+            ) : (
+              <>
+                <strong>PrepBro backend is waking up.</strong> This may take a few seconds because the free server sleeps when inactive.
+                {backendWakeMessage && <span className="backend-banner-note">{backendWakeMessage}</span>}
+              </>
+            )}
           </span>
-          <button className="backend-banner-retry" onClick={checkBackend}>Retry</button>
+          <button
+            className="backend-banner-retry"
+            type="button"
+            onClick={isLocalApi ? checkBackend : wakeBackend}
+            disabled={!isLocalApi && backendWakeLoading}
+          >
+            {isLocalApi ? "Retry" : backendWakeLoading ? "Waking up..." : "Wake Backend"}
+          </button>
         </div>
       )}
       {backendStatus === "checking" && (

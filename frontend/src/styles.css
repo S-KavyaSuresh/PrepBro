@@ -133,7 +133,7 @@ body.theme-high-contrast {
   position: sticky;
   top: 0;
   z-index: 100;
-  height: var(--header-height);
+  min-height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -141,12 +141,15 @@ body.theme-high-contrast {
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border-subtle);
   box-shadow: var(--shadow-sm);
+  overflow: visible;
 }
 
 .app-logo {
   display: flex;
   align-items: center;
   gap: 6px;
+  min-height: 44px;
+  overflow: visible;
 }
 
 .prepbro-app-icon {
@@ -157,9 +160,22 @@ body.theme-high-contrast {
 }
 
 .logo-icon {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  display: block;
   flex-shrink: 0;
+}
+
+.logo-wrap {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 12px;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .logo-mark {
@@ -2845,6 +2861,11 @@ body.theme-high-contrast {
 }
 .backend-banner-icon { font-size: 1.1rem; flex-shrink: 0; }
 .backend-banner-text { flex: 1; line-height: 1.5; }
+.backend-banner-note {
+  display: block;
+  margin-top: 4px;
+  font-weight: 700;
+}
 .backend-banner-text code {
   background: rgba(255,255,255,0.15);
   border-radius: 4px;
@@ -2864,6 +2885,10 @@ body.theme-high-contrast {
   flex-shrink: 0;
 }
 .backend-banner-retry:hover { background: #fef2f2; }
+.backend-banner-retry:disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
+}
 
 /* ── Global Toast Stack ────────────────────────────────────────────────────── */
 .toast-stack {
