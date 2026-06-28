@@ -6,7 +6,6 @@ import { fetchAccountProgress, hasGuestProgress, saveAccountProgress, syncGuestP
 
 const PASSWORD_HELP = "Minimum 8 characters, including uppercase, lowercase, and a number.";
 const PASSWORD_TOO_LONG = "Password is too long. Please use 72 bytes or fewer.";
-const SIGNUP_VERIFY_KEY = "prepbro_verified_signup_email";
 const SIGNUP_DRAFT_KEY = "prepbro_signup_draft";
 
 function emitToast(msg, type = "error") {
@@ -42,14 +41,13 @@ function validatePassword(password) {
   return "";
 }
 
-function loadStoredSignupVerificationState() {
-  const verifiedEmail = (localStorage.getItem(SIGNUP_VERIFY_KEY) || "").trim().toLowerCase();
+function loadStoredSignupDraft() {
   const storedDraft = localStorage.getItem(SIGNUP_DRAFT_KEY);
-  if (!storedDraft) return { verifiedEmail, draft: null };
+  if (!storedDraft) return null;
   try {
-    return { verifiedEmail, draft: JSON.parse(storedDraft) };
+    return JSON.parse(storedDraft);
   } catch {
-    return { verifiedEmail, draft: null };
+    return null;
   }
 }
 
@@ -83,10 +81,8 @@ export default function AuthPage({ mode = "signup", onAuthSuccess, onBackToDashb
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [guestImportModalOpen, setGuestImportModalOpen] = useState(false);
   const guestImportResolver = useRef(null);
-  const [verifiedSignupEmail, setVerifiedSignupEmail] = useState(() => localStorage.getItem(SIGNUP_VERIFY_KEY) || "");
-  const syncVerifiedSignupState = useMemo(() => () => {
-    const { verifiedEmail, draft } = loadStoredSignupVerificationState();
-    setVerifiedSignupEmail(verifiedEmail);
+  const syncSignupDraft = useMemo(() => () => {
+    const draft = loadStoredSignupDraft();
     if (!draft) return;
     setAuthForm((current) => ({
       ...emptyAuthForm(),
@@ -99,22 +95,14 @@ export default function AuthPage({ mode = "signup", onAuthSuccess, onBackToDashb
   useEffect(() => {
     setAuthMode(mode);
     if (mode === "signup") {
-      const { verifiedEmail, draft } = loadStoredSignupVerificationState();
+      const draft = loadStoredSignupDraft();
       if (draft) {
         setAuthForm({ ...emptyAuthForm(), ...draft });
-      } else if (verifiedEmail) {
-        setAuthForm({
-          ...emptyAuthForm(),
-          email: verifiedEmail,
-          parent_guardian_email: verifiedEmail,
-        });
       } else {
         setAuthForm(emptyAuthForm());
       }
-      setVerifiedSignupEmail(verifiedEmail);
     } else {
       setAuthForm(emptyAuthForm());
-      setVerifiedSignupEmail("");
     }
     setShowPassword(false);
     setShowConfirmPassword(false);
@@ -124,23 +112,23 @@ export default function AuthPage({ mode = "signup", onAuthSuccess, onBackToDashb
 
   useEffect(() => {
     if (authMode !== "signup") return;
-    const refreshVerificationState = () => {
-      syncVerifiedSignupState();
+    const refreshSignupDraft = () => {
+      syncSignupDraft();
     };
     const handleStorage = (event) => {
-      if (!event.key || event.key === SIGNUP_VERIFY_KEY || event.key === SIGNUP_DRAFT_KEY) {
-        syncVerifiedSignupState();
+      if (!event.key || event.key === SIGNUP_DRAFT_KEY) {
+        syncSignupDraft();
       }
     };
-    window.addEventListener("focus", refreshVerificationState);
+    window.addEventListener("focus", refreshSignupDraft);
     window.addEventListener("storage", handleStorage);
-    document.addEventListener("visibilitychange", refreshVerificationState);
+    document.addEventListener("visibilitychange", refreshSignupDraft);
     return () => {
-      window.removeEventListener("focus", refreshVerificationState);
+      window.removeEventListener("focus", refreshSignupDraft);
       window.removeEventListener("storage", handleStorage);
-      document.removeEventListener("visibilitychange", refreshVerificationState);
+      document.removeEventListener("visibilitychange", refreshSignupDraft);
     };
-  }, [authMode, syncVerifiedSignupState]);
+  }, [authMode, syncSignupDraft]);
 
   const isStudent = authForm.role === "student";
   const learnerAge = Number(authForm.learner_age || 0);
@@ -151,7 +139,6 @@ export default function AuthPage({ mode = "signup", onAuthSuccess, onBackToDashb
       ? (isChildLearner ? authForm.parent_guardian_email : authForm.email)
       : authForm.email).trim().toLowerCase();
   }, [authMode, isStudent, isChildLearner, authForm.parent_guardian_email, authForm.email]);
-  const signupEmailIsVerified = authMode === "signup" && Boolean(signupAccountEmail) && signupAccountEmail === verifiedSignupEmail;
 
   const roleSummary = useMemo(() => {
     if (authMode === "login") return "Sign in to load your PrepBro account and synced progress.";
@@ -181,23 +168,6 @@ export default function AuthPage({ mode = "signup", onAuthSuccess, onBackToDashb
     class_handled: authForm.class_handled,
     subject_department: authForm.subject_department,
   });
-
-  useEffect(() => {
-    if (!verifiedSignupEmail || authMode !== "signup") return;
-    if (signupAccountEmail && signupAccountEmail !== verifiedSignupEmail) {
-      setSignupVerificationStatus(`Verified email saved for ${verifiedSignupEmail}. Update the account email to match it or verify the new email.`);
-      return;
-    }
-    if (signupAccountEmail && signupAccountEmail === verifiedSignupEmail) {
-      setSignupVerificationStatus(`Email verified for ${verifiedSignupEmail}. You can create your account now.`);
-    }
-  }, [authMode, signupAccountEmail, verifiedSignupEmail]);
-
-  useEffect(() => {
-    if (signupEmailIsVerified) {
-      setSignupVerificationStatus(`Email verified for ${verifiedSignupEmail}. You can create your account now.`);
-    }
-  }, [signupEmailIsVerified, verifiedSignupEmail]);
 
   useEffect(() => {
     if (authMode === "signup") {
@@ -307,10 +277,6 @@ export default function AuthPage({ mode = "signup", onAuthSuccess, onBackToDashb
   };
 
   const handleSignup = async () => {
-    if (!signupEmailIsVerified) {
-      emitToast("Please verify this email before creating the account.", "error");
-      return;
-    }
     const validationError = validateSignup();
     if (validationError) {
       emitToast(validationError, "error");
@@ -332,9 +298,7 @@ export default function AuthPage({ mode = "signup", onAuthSuccess, onBackToDashb
         await fetchAccountProgress().catch(() => {});
       }
       emitToast("Account created successfully.", "success");
-      localStorage.removeItem(SIGNUP_VERIFY_KEY);
       localStorage.removeItem(SIGNUP_DRAFT_KEY);
-      setVerifiedSignupEmail("");
       setSignupVerificationStatus("");
       setSignupVerificationPreviewUrl("");
       setAuthForm(emptyAuthForm());
@@ -344,50 +308,6 @@ export default function AuthPage({ mode = "signup", onAuthSuccess, onBackToDashb
       resetSensitiveFields();
     } finally {
       setBusy(false);
-    }
-  };
-
-  const handleRequestSignupVerification = async () => {
-    if (!signupAccountEmail) {
-      emitToast(isChildLearner ? "Enter Parent/Guardian Email first." : "Enter a valid account email first.", "error");
-      return;
-    }
-    if (!isValidEmail(signupAccountEmail)) {
-      emitToast("Please enter a valid email first.", "error");
-      return;
-    }
-    setVerifyingSignupEmail(true);
-    localStorage.setItem(SIGNUP_DRAFT_KEY, JSON.stringify(authForm));
-    setSignupVerificationStatus("");
-    setSignupVerificationPreviewUrl("");
-    try {
-      const response = await apiFetch("/verification/request-signup", withJsonBody("POST", {
-        email: signupAccountEmail,
-        draft: buildSignupVerificationDraft(),
-      }));
-      if (response.demo_fallback) {
-        localStorage.setItem(SIGNUP_VERIFY_KEY, signupAccountEmail);
-        setVerifiedSignupEmail(signupAccountEmail);
-        setSignupVerificationStatus("Email verification is unavailable in this demo deployment. You can continue using PrepBro for testing.");
-        setSignupVerificationPreviewUrl("");
-        emitToast("Email verification is unavailable in this demo deployment. You can continue using PrepBro for testing.", "success");
-      } else if (response.sent) {
-        setSignupVerificationStatus(`Verification email sent to ${signupAccountEmail}. Please check inbox or spam and verify it to continue.`);
-        setSignupVerificationPreviewUrl(response.preview_verify_url || "");
-        emitToast(`Verification email sent to ${signupAccountEmail}.`, "success");
-      } else if (response.preview_verify_url) {
-        setSignupVerificationStatus(`Verification preview generated for ${signupAccountEmail}. Open the link to continue.`);
-        setSignupVerificationPreviewUrl(response.preview_verify_url);
-        emitToast("Verification preview generated. Open the verification link to continue.", "success");
-      } else {
-        setSignupVerificationStatus(response.reason || "Could not send verification email.");
-        emitToast(response.reason || "Could not send verification email.", "error");
-      }
-    } catch (error) {
-      setSignupVerificationStatus(error.message || "Could not send verification email.");
-      emitToast(error.message || "Could not send verification email.", "error");
-    } finally {
-      setVerifyingSignupEmail(false);
     }
   };
 
@@ -565,36 +485,23 @@ export default function AuthPage({ mode = "signup", onAuthSuccess, onBackToDashb
             )}
           </div>
 
-          {authMode === "signup" && signupVerificationStatus ? (
-            <div className="account-settings-note">
-              <div>{signupVerificationStatus}</div>
-              {signupVerificationPreviewUrl ? (
-                <a className="account-settings-inline-link" href={signupVerificationPreviewUrl}>
-                  Open verification link
-                </a>
-              ) : null}
-            </div>
-          ) : null}
-
           <div className="account-settings-actions">
             <button
               className="btn-primary"
               type="button"
-              onClick={authMode === "signup" ? (signupEmailIsVerified ? handleSignup : handleRequestSignupVerification) : handleLogin}
-              disabled={busy || verifyingSignupEmail}
+              onClick={authMode === "signup" ? handleSignup : handleLogin}
+              disabled={busy}
             >
-              {busy || verifyingSignupEmail
+              {busy
                 ? "Please wait..."
                 : authMode === "signup"
-                  ? signupEmailIsVerified ? "Create Account" : "Verify Email"
+                  ? "Create Account"
                   : "Log In"}
             </button>
             <button className="btn-ghost" type="button" onClick={() => {
               setAuthMode((current) => (current === "signup" ? "login" : "signup"));
               setAuthForm(emptyAuthForm());
-              localStorage.removeItem(SIGNUP_VERIFY_KEY);
               localStorage.removeItem(SIGNUP_DRAFT_KEY);
-              setVerifiedSignupEmail("");
               setSignupVerificationStatus("");
               setSignupVerificationPreviewUrl("");
             }}>

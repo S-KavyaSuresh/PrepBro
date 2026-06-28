@@ -1349,7 +1349,6 @@ def signup(payload: SignupRequest) -> Dict[str, Any]:
         existing = connection.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone()
         if existing:
             raise HTTPException(status_code=400, detail="An account with this email already exists.")
-        require_verified_signup_email(connection, email)
         linked_teacher = None
         if payload.role == "student" and teacher_email:
             linked_teacher = get_teacher_user_by_email(connection, teacher_email)
@@ -1402,7 +1401,6 @@ def signup(payload: SignupRequest) -> Dict[str, Any]:
                     relationship_type="teacher",
                 )
 
-        consume_verified_signup_email(connection, email)
         token, expires_at = create_access_token(user_id, email, settings)
         return {
             "access_token": token,
