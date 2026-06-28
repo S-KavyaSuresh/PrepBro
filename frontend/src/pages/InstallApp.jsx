@@ -45,9 +45,9 @@ export default function InstallApp({
 installAvailable,
 onInstallClick,
 isInstalled,
-desktopVersion = "v1.0.0",
-mobileVersion = "v1.0.0",
-webVersion = "v1.0.0",
+desktopVersion = "v2.1.0",
+mobileVersion = "v2.1.0",
+webVersion = "v2.1.0",
 }) {
 const [activeTab, setActiveTab] = useState("pc");
 
@@ -112,7 +112,6 @@ Choose how you want to access PrepBro across desktop, mobile, and the web app ex
           href={WINDOWS_INSTALLER_URL}
           target="_blank"
           rel="noopener noreferrer"
-          download
         >
           Download for Windows
         </a>
@@ -157,7 +156,6 @@ Choose how you want to access PrepBro across desktop, mobile, and the web app ex
           href={ANDROID_APK_URL}
           target="_blank"
           rel="noopener noreferrer"
-          download
         >
           Download Android APK
         </a>
@@ -220,6 +218,7 @@ Choose how you want to access PrepBro across desktop, mobile, and the web app ex
     </section>
   )}
 </div>
+```
 
 );
 }
