@@ -4638,3 +4638,338 @@ body.theme-high-contrast {
     width: 100%;
   }
 }
+
+/* ==============================
+   MOBILE LAYOUT SAFETY LAYER
+   Keeps the existing design but prevents cramped/overflowing mobile UI.
+   ============================== */
+
+@media (max-width: 768px) {
+  html,
+  body,
+  #root {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .app-root {
+    height: auto;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: visible;
+  }
+
+  .app-header {
+    min-height: 64px;
+    padding: 10px 12px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .app-logo {
+    min-width: 0;
+    flex: 1 1 190px;
+    gap: 5px;
+  }
+
+  .logo-wrap {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+  }
+
+  .logo-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .logo-mark {
+    padding: 7px 12px;
+    font-size: 1rem;
+  }
+
+  .logo-mark-alt {
+    font-size: 1rem;
+  }
+
+  .app-header-right {
+    flex: 0 0 auto;
+    gap: 8px;
+  }
+
+  .header-install-btn {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+
+  .user-avatar {
+    min-width: 38px;
+    height: 38px;
+    padding: 0 12px;
+  }
+
+  .user-account-panel {
+    position: fixed;
+    top: 72px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-height: calc(100dvh - 88px);
+    overflow-y: auto;
+  }
+
+  .app-main {
+    display: block;
+    min-height: auto;
+    padding: 12px;
+    padding-right: 12px;
+    overflow: visible;
+  }
+
+  .main-content,
+  .dashboard-page,
+  .simplify-page,
+  .planner-page,
+  .gamified-page,
+  .breaktime-page,
+  .account-settings-page,
+  .install-page {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .feature-tabs,
+  .mentor-tab-row {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 8px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .feature-tabs::-webkit-scrollbar,
+  .mentor-tab-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .feature-tab,
+  .mentor-tab-btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+  }
+
+  .card,
+  .account-settings-card,
+  .managed-student-dashboard-card,
+  .assignment-card,
+  .mentor-learner-card,
+  .mentor-dashboard-section,
+  .dashboard-chart-section {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .page-header,
+  .dashboard-page .page-header,
+  .dashboard-page-header,
+  .managed-students-dashboard-head,
+  .mentor-assignment-detail-head,
+  .mentor-assignment-list-head,
+  .planner-header-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .dashboard-report-btn,
+  .managed-students-dashboard-head .btn-primary,
+  .managed-student-dashboard-head .btn-primary {
+    width: 100%;
+  }
+
+  .stats-grid,
+  .dashboard-main-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .stat-card {
+    min-width: 0;
+    padding: 14px 10px;
+  }
+
+  .account-settings-grid,
+  .account-settings-form,
+  .auth-page .account-settings-grid,
+  .auth-page .account-settings-form,
+  .assignment-form-grid,
+  .class-assignment-row,
+  .class-management-form,
+  .goal-editor-top-row,
+  .goal-editor-bottom-row,
+  .student-assignment-card,
+  .student-assignment-body,
+  .assignment-inline-grid,
+  .mentor-learner-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .user-account-field,
+  .password-row .user-account-field,
+  .account-settings-field-wide {
+    min-width: 0;
+    grid-column: auto;
+  }
+
+  input,
+  select,
+  textarea,
+  .user-account-field input,
+  .user-account-field select,
+  .user-account-field textarea,
+  .assignment-form-grid textarea,
+  .class-management-form textarea {
+    max-width: 100%;
+  }
+
+  .password-field-wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 42px;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .account-settings-actions,
+  .student-assignment-actions,
+  .assignment-action-row,
+  .assignment-card-actions,
+  .mentor-assignment-list-actions,
+  .goal-editor-actions,
+  .install-banner-actions {
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+
+  .account-settings-actions > button,
+  .student-assignment-actions > button,
+  .assignment-action-row > button,
+  .assignment-card-actions > button,
+  .mentor-assignment-list-actions > button {
+    flex: 1 1 150px;
+  }
+
+  .assignment-grade-card-head,
+  .assignment-grade-controls-row {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .assignment-grade-meta {
+    justify-content: flex-start;
+  }
+
+  .mentor-assignment-targets-scroll {
+    max-height: 62dvh;
+    padding-right: 0;
+  }
+
+  .goal-editor-dialog,
+  .mentor-assignment-detail-dialog,
+  .badge-preview-card,
+  .class-assignment-dialog {
+    width: min(96vw, 720px);
+    max-height: 88dvh;
+    overflow-y: auto;
+  }
+
+  .settings-banner {
+    width: min(88vw, var(--settings-width));
+  }
+
+  .settings-banner-closed {
+    transform: translateX(calc(100% - 34px));
+  }
+
+  .install-banner {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    width: auto;
+    max-width: none;
+  }
+
+  .install-banner-main {
+    min-width: 0;
+  }
+
+  .install-banner-text {
+    overflow-wrap: anywhere;
+  }
+
+  .floating-support {
+    right: 12px;
+    bottom: 16px;
+  }
+
+  .backend-banner {
+    padding: 10px 12px;
+    align-items: flex-start;
+  }
+
+  .backend-banner-retry {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header {
+    align-items: flex-start;
+  }
+
+  .app-logo {
+    flex-basis: 100%;
+  }
+
+  .app-header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .header-install-btn {
+    flex: 1 1 auto;
+  }
+
+  .stats-grid,
+  .dashboard-main-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-tabs,
+  .mentor-tab-row {
+    margin-inline: -2px;
+  }
+
+  .btn-primary,
+  .btn-ghost,
+  .btn-secondary {
+    min-height: 42px;
+  }
+
+  .install-banner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .install-banner-actions .install-action-btn,
+  .install-banner-close {
+    width: 100%;
+  }
+}
